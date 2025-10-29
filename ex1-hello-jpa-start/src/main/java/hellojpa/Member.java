@@ -51,7 +51,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class Member {
+public class Member extends BaseEntity {
+
     @Id @GeneratedValue
     @Column(name="MEMBER_ID")
     private Long id;
@@ -62,8 +63,8 @@ public class Member {
 //    @Column(name="Team_ID")
 //    private Long teamId;
 
-    @ManyToOne
-    @JoinColumn(insertable = false, updatable = false, name ="TEAM_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="TEAM_ID")
     private Team team;
     //JPA에게 관계 설명
 

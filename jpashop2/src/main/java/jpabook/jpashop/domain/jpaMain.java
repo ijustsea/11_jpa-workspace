@@ -20,13 +20,19 @@ public class jpaMain {
             //Member member = em.find(Member.class, memberId);
             //Member findMember = order.getMember();
 
-            Order order = new Order();
+            //Order order = new Order();
             //order.addOrderItem(new OrderItem());
-            em.persist(order);
+            //em.persist(order);
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            em.persist(orderItem);
+            //OrderItem orderItem = new OrderItem();
+            //orderItem.setOrder(order);
+            //em.persist(orderItem);
+
+            Book book = new Book();
+            book.setName("JPA의 정석");
+            book.setAuthor("김시연");
+
+            em.persist(book);
 
             tx.commit();//자동 flush 호출
         }catch (Exception e){
