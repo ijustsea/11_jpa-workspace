@@ -194,29 +194,80 @@ public class JpaMain {
 
             //@ManyToOne, @OneToOne DEFAULT EAGER이어서 LAZY로 수정해야한다.
 
-            Child child1 = new Child();
-            Child child2= new Child();
-
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
-
-            em.persist(parent);
-            em.persist(child1);
-            em.persist(child2);
-
-            em.flush();
-            em.clear();
-
-            Parent findParent = em.find(Parent.class, parent.getId());
-            em.remove(findParent);
-            findParent.getChildList().remove(0);//Child Entity를 컬랙션에서 제거
+//            Child child1 = new Child();
+//            Child child2 = new Child();
+//
+//            Parent parent = new Parent();
+//            parent.addChild(child1);
+//            parent.addChild(child2);
+//
+//            em.persist(parent);
+//            em.persist(child1);
+//            em.persist(child2);
+//
+//            em.flush();
+//            em.clear();
+//
+//            Parent findParent = em.find(Parent.class, parent.getId());
+//            em.remove(findParent);
+//            findParent.getChildList().remove(0);//Child Entity를 컬랙션에서 제거
             //parent에서 childList orphanRemoval = true 해놓으면 부모자식관계가 끊어지면서 고아객체로됨.
             //고아객체는 OneToOne OneToMany에서만 작성해서 사용
 
             //orphanRemoval = true 지우고, em.persist(child1)(child2)하고
             //em.remove(findParent)하면 부모자식 다 사라진다.
             //즉 부모를 통해 자식의 생명주기를 관리할수 있는 것이다.
+
+//            Address address = new Address("서울", "테헤란로", "10000");
+//
+//            Member member1 = new Member();
+//            member1.setUsername("member1");
+//            member1.setHomeAddress(address);
+//            em.persist(member1);
+//
+//            Address newAddress = new Address("부산", address.getStreet(), address.getZipcode());
+//
+//            member1.setHomeAddress(newAddress);
+
+            //임베디드 타입을 공유해서 발생하는 문제. sideEffect 객체타입의 한계
+            //해결방법 : 복사 , 불변객체
+            //공유 참조로 인해 발생하는 부작용을 피할 수 있다.
+
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.setHomeAddress(new Address("서울", "사당로", "07011"));
+//
+//            member.getFavoriteFoods().add("치킨");
+//            member.getFavoriteFoods().add("족발");
+//            member.getFavoriteFoods().add("피자");
+//
+//            member.getAddressHistory().add(new AddressEntity("부산", "사당로", "1111" ));
+//            member.getAddressHistory().add(new AddressEntity("여수", "사당로", "1111" ));
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+//            System.out.println("====================== START ===================");
+//            Member findMember = em.find(Member.class, member.getId());
+//
+//           //서울 => 과천
+//            Address a = findMember.getHomeAddress();
+//            findMember.setHomeAddress( new Address("과천", a.getStreet(), a.getZipcode()) );
+//            //치킨=> 요아정
+//            findMember.getFavoriteFoods().remove("치킨");
+//            findMember.getFavoriteFoods().add("요아정");
+//
+//            findMember.getAddressHistory().remove(new AddressEntity("부산", "사당로", "1111" ));
+//            findMember.getAddressHistory().add(new AddressEntity("대전", "성심당로","10000"));
+
+//            List<Member> result = em.createQuery("select m from Member as m where m.username like '%kim%'", Member.class).getResultList();
+//
+//            for(Member m : result){
+//                System.out.println("member : "  + m);
+//            }
+
+
 
 
             tx.commit();//자동 flush 호출
