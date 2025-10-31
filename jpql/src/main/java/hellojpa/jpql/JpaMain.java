@@ -324,11 +324,12 @@ public class JpaMain {
             order7.setAddress(new Address("사당", "마음대로", "77777"));
             em.persist(order7);
 
-            String query = "select mod(p.stockAmount, 3) from Product p";
-            List<Integer> resultList = em.createQuery(query, Integer.class).getResultList();
-            for (Integer i : resultList) {
-                System.out.println(i);
+            String query = "select o.orderAmount, p.name from Order o join o.product p";
+            List<Object[]> resultList = em.createQuery(query).getResultList();
+            for (Object[] result : resultList) {
+                System.out.println("Product Name: " + result[1] + ", Order Amount: " + result[0]);
             }
+
             tx.commit();
         }catch (Exception e){
             tx.rollback();
