@@ -56,4 +56,15 @@ public abstract class Item extends BaseEntity{
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "itemId=" + itemId +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", stockQuantity=" + stockQuantity +
+                ", categories=" + categories +
+                '}';
+    }
 }

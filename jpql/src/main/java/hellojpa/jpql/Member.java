@@ -3,6 +3,7 @@ package hellojpa.jpql;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Fetch;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -16,6 +17,12 @@ public class Member {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name= "TEAM_ID")
     private Team team;
+
+    @Embedded
+    private Address address;
+
+    @Enumerated(STRING)
+    private MemberType memberType;
 
     public Long getId() {
         return id;
@@ -47,5 +54,31 @@ public class Member {
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", age=" + age +
+                ", address=" + address +
+                '}';
+    }
+
+    public MemberType getMemberType() {
+        return memberType;
+    }
+
+    public void setMemberType(MemberType memberType) {
+        this.memberType = memberType;
     }
 }

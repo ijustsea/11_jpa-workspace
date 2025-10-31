@@ -34,6 +34,18 @@ public class jpaMain {
 
             em.persist(book);
 
+            em.flush(); em.clear();
+            //JPQL 타입 표현 예시
+
+            String query = "select i from Item i"
+                       + " where type(i) = Book";
+
+            List<Item> result = em.createQuery(query, Item.class).getResultList();
+
+            for (Item item : result) {
+                System.out.println("Item 중 Book : "+ item);
+            }
+
             tx.commit();//자동 flush 호출
         }catch (Exception e){
             tx.rollback();
