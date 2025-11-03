@@ -323,12 +323,40 @@ public class JpaMain {
             order7.setProduct(product8);
             order7.setAddress(new Address("사당", "마음대로", "77777"));
             em.persist(order7);
+            //기존 것
+            Team team1 = new Team();
+            team1.setName("teamA");
+            em.persist(team1);
 
-            String query = "select o.orderAmount, p.name from Order o join o.product p";
-            List<Object[]> resultList = em.createQuery(query).getResultList();
-            for (Object[] result : resultList) {
-                System.out.println("Product Name: " + result[1] + ", Order Amount: " + result[0]);
-            }
+            Team team2 = new Team();
+            team2.setName("teamB");
+            em.persist(team2);
+
+            Member member1 = new Member();
+            member1.setUsername("admin1");
+            member1.setTeam(team1);
+            em.persist(member1);
+
+            Member member2 = new Member();
+            member2.setUsername("admin2");
+            member2.setTeam(team2);
+            em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("user1");
+            member3.setTeam(team1);
+            em.persist(member3);
+
+            em.flush();em.clear();
+
+            String query = "update Member m set m.age = 20";
+            int resultcount = em.createQuery(query).executeUpdate();
+            em.clear();
+            Member findMember = em.find(Member.class, member1.getId());
+
+            System.out.println("member1.age : " + findMember.getAge());
+
+            System.out.println("resultCount : " + resultcount);
 
             tx.commit();
         }catch (Exception e){
