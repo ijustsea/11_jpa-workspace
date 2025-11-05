@@ -1,0 +1,85 @@
+package jpabook.jpashop.service;
+
+import jakarta.persistence.EntityManager;
+import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.repository.MemberRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.text.html.parser.Entity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+class MemberServiceTest {
+
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    EntityManager em;
+
+    @Test
+    public void 회원가입() throws Exception {
+        //given
+        Member member = new Member();
+        member.setName("kimeechan");
+        //when
+        Long saveId = memberService.join(member);
+        //then
+        em.flush(); //롤백은 안되는데 쿼리만 볼수있게
+        assertEquals(member, memberRepository.findOne(saveId));
+    }
+
+    @Test
+    public void 중복_회원_예외() throws Exception {
+        //given
+        Member member1 = new Member();
+        member1.setName("kimeechan");
+        Member member2 = new Member();
+        member2.setName("kimeechan");
+        //when
+        memberService.join(member1);
+//        try{
+//            memberService.join(member2);//예외발생 해야함.
+//        }catch (IllegalStateException e){
+//            return;
+//        }
+        //assertThrows(예외클래스, 람다식)
+        assertThrows(IllegalStateException.class,
+                () -> memberService.join(member2));
+
+        //then
+        //fail("예외발생 해야한다");
+    }
+
+    @Test
+    public void 중복회원() throws Exception {
+        //given
+        Member member1 = new Member();
+        member1.setName("kimbob");
+
+        Member member2 = new Member();
+        member2.setName("kimbob");
+        //when
+        memberService.join(member1);
+
+        /*try {
+            memberService.join(member2);
+        } catch (IllegalStateException e) {
+            return;
+        }*/
+        assertThrows(IllegalStateException.class, ()->memberService.join(member2));
+
+        //then
+        //fail("예외가 발생한다");
+
+    }
+
+}

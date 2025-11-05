@@ -19,6 +19,7 @@ public class Member {
 
     private Address address;
 
+    //1:N 관계
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
