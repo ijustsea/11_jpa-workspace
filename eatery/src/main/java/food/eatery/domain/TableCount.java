@@ -17,5 +17,5 @@ public class TableCount {
     @OneToOne(mappedBy = "tableCount", fetch = LAZY)
     private Reserv reserv;
 
-    private int tableCount;
+    private int tableCounts;
 }

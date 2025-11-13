@@ -49,7 +49,7 @@
         }
 
         //예약생성 method
-        public static food.eatery.domain.Reserv createReserv(Customer customer, TableCount tableCount){
+        public static Reserv createReserv(Customer customer, TableCount tableCount){
             food.eatery.domain.Reserv reserv = new food.eatery.domain.Reserv();
             reserv.setCustomer(customer);
             reserv.setTableCount(tableCount);
