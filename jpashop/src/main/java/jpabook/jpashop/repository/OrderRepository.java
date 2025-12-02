@@ -1,14 +1,17 @@
 package jpabook.jpashop.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,7 @@ public class OrderRepository {
     }
 
     //검색기능
-    public List<Order> findAll(OrderSearch orderSearch){
+    public List<Order> findAlls(OrderSearch orderSearch){
         String jpql = "select o from Order o join o.member m";
 
         List<Order> result = em.createQuery(jpql +
@@ -79,30 +82,73 @@ public class OrderRepository {
         return query.getResultList();
     }
 
-    public List<Order> findAllByCriteria(OrderSearch orderSearch) {
+   public List<Order> findAll(OrderSearch orderSearch){
+       QOrder order = QOrder.order;
+       QMember member = QMember.member;
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Order> cq = cb.createQuery(Order.class);
-        Root<Order> o = cq.from(Order.class);
-        Join<Order, Member> m = o.join("member", JoinType.INNER); //회원과 조인
+       JPAQueryFactory query = new JPAQueryFactory(em);
+       return query
+               .select(order)
+               .from(order)
+               .join(order.member, member)
+               .where(statusEq(orderSearch.getOrderStatus()), nameLike(orderSearch, member))
+               .limit(1000)
+               .fetch();
 
-        List<Predicate> criteria = new ArrayList<>();
+   }
 
-        //주문 상태 검색
-        if (orderSearch.getOrderStatus() != null) {
-            Predicate status = cb.equal(o.get("status"), orderSearch.getOrderStatus());
-            criteria.add(status);
+   private  BooleanExpression nameLike(OrderSearch orderSearch, QMember member){
+        if(!StringUtils.hasText(orderSearch.getMemberName())){
+            return  null;
         }
-        //회원 이름 검색
-        if (StringUtils.hasText(orderSearch.getMemberName())) {
-            Predicate name =
-                    cb.like(m.<String>get("name"), "%" + orderSearch.getMemberName() + "%");
-            criteria.add(name);
-        }
+        return member.name.contains(orderSearch.getMemberName());
 
-        cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
-        TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
-        return query.getResultList();
+   }
+
+   private BooleanExpression statusEq(OrderStatus statusCond) {
+        if(statusCond == null){
+            return null;
+        }
+        return QOrder.order.status.eq(statusCond);
+
+   }
+
+
+
+
+    public List<Order> findAllWithMemberDelivery() {
+        List<Order> result = em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        ).getResultList();
+        return result;
     }
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m " +
+                        " join fetch o.delivery d " +
+                        " join fetch o.orderItems oi " +
+                        " join fetch oi.item i ", Order.class)
+                .setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+    }
+
+    //먼저 ToOne의 관계를 패치조인한다 페이징!
+    public List<Order> findAllWithItem(int offset, int limit) {
+        List<Order> result = em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        )
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+        return result;
+    }
+
 
 }
